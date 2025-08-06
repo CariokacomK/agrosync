@@ -60,7 +60,7 @@ Este projeto ainda está nos primeiros commits. Em breve, deixaremos aqui as ins
 
 | Nome        | Função             |
 |-------------|--------------------|
-| Gabriel  B. | P.O                |
+| Gabriel B.  | P.O                |
 | Maria P.    | Gerente de Projeto |
 | Bruno Z.    | Dev / DBA          |
 | Rodrigo R.  | Dev / Back         |
@@ -80,9 +80,13 @@ Este projeto ainda está nos primeiros commits. Em breve, deixaremos aqui as ins
 ├── docker-compose/ # Em breve
 └── README.md
 
+---
+
 ## 📢 Aviso
 
 Este repositório faz parte de um **projeto de faculdade** ainda em desenvolvimento.  
 Tudo aqui está sujeito a mudanças, melhorias e recomeços. Bem-vindo ao nosso infinito. ♾️
 
-## Agro Sync: Inovação que planta resultados
+---
+
+# Agro Sync: Inovação que planta resultados
