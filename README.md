@@ -73,11 +73,11 @@ Este projeto ainda está nos primeiros commits. Em breve, deixaremos aqui as ins
 
 ## 🗂️ Estrutura do Projeto (em crescimento)
 
-/agro-sync
-|-- BackEnd /#Em breve
-|-- FrontEnd /#Em breve
-|-- Banco de Dados /#Em breve
-|-- README.md
+/agro-sync <br>
+|-- BackEnd /#Em breve <br>
+|-- FrontEnd /#Em breve <br>
+|-- Banco de Dados /#Em breve <br>
+|-- README.md <br>
 
 ---
 
