@@ -1,0 +1,89 @@
+Caso de Uso 1: Cadastro de Cooperativas
+Ator Principal: Administrador do Sistema (comprador do sistema)
+ Pré-condições: O sistema deve estar habilitado para cadastro e o administrador está autenticado no sistema.
+1.O administrador seleciona a opção “Cadastro de Cooperativa” no menu.
+2.O sistema exibe um formulário para cadastro de cooperativas (CNPJ, razão social, endereço, contatos).
+3.O administrador preenche os campos obrigatórios.
+4.O administrador confirma o cadastro.
+5.O sistema armazena os dados e gera um identificador único para a cooperativa.
+6.O sistema exibe uma mensagem de sucesso.
+
+Fluxo Alternativo:
+-Se algum campo obrigatório estiver vazio, o sistema exibe mensagens de erro e impede a conclusão do cadastro.
+
+Pós-condições:
+- A cooperativa fica registrada e pode cadastrar/vincular produtores rurais.
+
+
+Caso de Uso 2: Controle e Emissão de Notas Fiscais
+Ator Principal: Produtor Rural
+Pré-condições: O produtor está autenticado no sistema.
+Fluxo Principal:
+1.O produtor acessa a opção “Notas Fiscais” no menu.
+2.O sistema exibe uma lista de notas fiscais já emitidas.
+3.O produtor seleciona “Emitir Nova NFP-e”.
+4.O sistema exibe formulário com dados da transação (produto, quantidade, valor).
+5.O produtor confirma a emissão.
+6.O sistema gera a nota fiscal eletrônica e registra a operação.
+7.O sistema exibe mensagem de sucesso e permite download/impressão da NFP-e.
+Fluxo Alternativo:
+-Se houver falha na conexão, o sistema salva os dados offline e emite a nota quando houver internet.
+- Se dados obrigatórios estiverem faltando, exibe mensagem de erro.
+Pós-condições: A nota fiscal é emitida, armazenada no histórico e pode ser consultada ou enviada ao cliente.
+
+
+Caso de Uso 3: Gestão de Cooperativas e Produtores Associados
+Ator Principal: Administrador da Cooperativa
+Pré-condições:
+-A cooperativa possui contrato ativo com a AgroSync.
+-O administrador está autenticado no sistema.
+
+Fluxo Principal
+1.O administrador da cooperativa acessa a opção “Gestão de Associados” no menu.
+2.O sistema exibe uma lista de produtores rurais já vinculados à cooperativa.
+3.O administrador seleciona “Adicionar Associado” para cadastrar um novo produtor.
+4.O sistema exibe formulário com campos obrigatórios (nome, CPF/CNPJ, contato, propriedade).
+5.O administrador confirma o cadastro.
+6.O sistema vincula o produtor rural à cooperativa e libera o acesso ao AgroSync.
+7.O sistema exibe mensagem de sucesso e atualiza a lista de associados.
+
+Fluxo Alternativo:
+-Se o produtor já estiver cadastrado, o sistema apenas o vincula à cooperativa.
+-Se algum campo obrigatório estiver ausente, o sistema exibe mensagens de erro e impede a conclusão do cadastro.
+-Se não houver internet, os dados são salvos localmente e sincronizados depois.
+
+Pós-condições:
+-O produtor rural tem acesso ao sistema por meio da cooperativa.
+-A cooperativa consegue gerenciar seus associados e monitorar quem tem acesso ao AgroSync.
+
+
+Caso de Uso 4: Controle de Estoque
+Ator Principal: Produtor Rural
+ Pré-condições: O produtor está autenticado no sistema.
+Fluxo Principal:
+1.O produtor seleciona “Controle de Estoque”.
+2.O sistema exibe uma lista de insumos e produtos cadastrados.
+3.O produtor pode adicionar novos itens ou atualizar quantidades.
+4.O sistema registra automaticamente entradas e saídas com base nas vendas (ligadas às notas fiscais).
+5.O produtor confirma as alterações.
+6.O sistema exibe mensagem de sucesso e atualiza relatórios.
+
+Fluxo Alternativo:
+- Se não houver internet, o sistema salva os dados offline e sincroniza depois.
+
+Pós-condições: O estoque é mantido atualizado e pode gerar alertas de reposição, vencimento, melhor preço de venda/compra.
+
+
+Caso de Uso 5: Treinamento Inicial do Usuário
+Ator Principal: Administrador ou Suporte da Agro Sync
+Pré-condições: O usuário está autenticado pela primeira vez.
+Fluxo Principal:
+1.O sistema identifica o primeiro acesso do usuário.
+2.O sistema exibe um tour interativo com explicações sobre as principais funcionalidades.
+3.O usuário pode avançar ou pular etapas do tutorial.
+4.Ao final, o sistema registra que o treinamento foi concluído.
+
+Fluxo Alternativo:
+- O usuário pode reabrir o tutorial a qualquer momento no menu “Ajuda”.
+
+Pós-condições: O usuário entende como usar o sistema e consegue operar as funções básicas sem auxílio externo.
