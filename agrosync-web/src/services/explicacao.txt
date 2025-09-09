@@ -1,0 +1,10 @@
+Serviços transversais e singletons: cliente axios + interceptors, auth/token storage, i18n, analytics/monitoring, adapters de storage, helpers de data/hora (se forem globais). Não dependem de nenhuma feature.
+Ex.: api.ts, auth.service.ts, storage.ts, i18n.ts.
+
+Regras de ouro
+
+components não chamam API; features encapsulam a lógica de negócio.
+
+services não importam nada de features (só o contrário).
+
+pages orquestram features; app fornece a infraestrutura (rotas/provedores).

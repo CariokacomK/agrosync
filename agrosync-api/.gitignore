@@ -1,0 +1,34 @@
+# Dependências
+/node_modules
+
+# Build
+/dist
+/build
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Ambiente
+.env
+.env.local
+.env.*.local
+
+# Editor / SO
+.idea
+.vscode
+.DS_Store
+Thumbs.db
+
+# Testes
+/coverage
+/.nyc_output
+
+# Cache do TypeScript
+*.tsbuildinfo
+
+# Cache do Next/Vite/Parcel/etc.
+.cache
