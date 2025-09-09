@@ -1,0 +1,10 @@
+Infraestrutura do app. Provedores globais (React Query, Redux/Context), roteador, App.tsx, configuração de tema (ex.: AntD ConfigProvider), guards, e “shell” da aplicação.
+Ex.: providers/, routes.tsx, App.tsx.
+
+Regras de ouro
+
+components não chamam API; features encapsulam a lógica de negócio.
+
+services não importam nada de features (só o contrário).
+
+pages orquestram features; app fornece a infraestrutura (rotas/provedores).

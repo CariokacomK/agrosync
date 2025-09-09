@@ -1,0 +1,11 @@
+Módulos por domínio (coisa que muda junto). Cada pasta concentra API, hooks, tipos, componentes e páginas daquela feature.
+Estrutura típica:
+features/users/{ api.ts, hooks.ts, types.ts, components/, pages/UsersPage.tsx, index.ts }
+
+Regras de ouro
+
+components não chamam API; features encapsulam a lógica de negócio.
+
+services não importam nada de features (só o contrário).
+
+pages orquestram features; app fornece a infraestrutura (rotas/provedores).

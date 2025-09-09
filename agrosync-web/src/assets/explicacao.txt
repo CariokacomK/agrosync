@@ -1,0 +1,10 @@
+Arquivos estáticos importados pelo bundler: imagens (png/jpg/svg), ícones, fontes, ilustrações. Nada de código TS/JS aqui.
+Ex.: logo.svg, fonts/Inter.woff2, illustrations/empty-state.png.
+
+Regras de ouro
+
+components não chamam API; features encapsulam a lógica de negócio.
+
+services não importam nada de features (só o contrário).
+
+pages orquestram features; app fornece a infraestrutura (rotas/provedores).
