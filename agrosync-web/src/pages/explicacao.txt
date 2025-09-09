@@ -1,0 +1,10 @@
+Páginas de alto nível/rotas globais ou “páginas casca” que compõem várias features (Home, Login, 404). Útil para manter as rotas organizadas e separar o que é geral do que é específico de uma feature.
+Ex.: Home.tsx, Login.tsx, NotFound.tsx.
+
+Regras de ouro
+
+components não chamam API; features encapsulam a lógica de negócio.
+
+services não importam nada de features (só o contrário).
+
+pages orquestram features; app fornece a infraestrutura (rotas/provedores).

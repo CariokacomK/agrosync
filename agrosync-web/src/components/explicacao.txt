@@ -1,0 +1,10 @@
+Componentes genéricos e reutilizáveis (design system): botões, modais, tabelas, inputs. Não conhecem regras de negócio nem chamam API diretamente.
+Ex.: Button.tsx, ModalConfirm.tsx, DataTable.tsx.
+
+Regras de ouro
+
+components não chamam API; features encapsulam a lógica de negócio.
+
+services não importam nada de features (só o contrário).
+
+pages orquestram features; app fornece a infraestrutura (rotas/provedores).
