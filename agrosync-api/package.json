@@ -3,23 +3,29 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "predev": "prisma generate",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "db:test": "ts-node src/infra/database/testConnection.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@prisma/client": "^6.16.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
-    "zod": "^4.1.5"
+    "pg": "^8.16.3",
+    "zod": "^4.1.8"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
     "@types/node": "^24.3.1",
+    "@types/pg": "^8.15.5",
+    "prisma": "^6.16.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.2"
   }

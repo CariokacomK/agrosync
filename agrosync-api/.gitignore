@@ -32,3 +32,5 @@ Thumbs.db
 
 # Cache do Next/Vite/Parcel/etc.
 .cache
+
+/src/generated/prisma
