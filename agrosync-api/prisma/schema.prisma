@@ -1,0 +1,177 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["agro", "app"]
+}
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// model fazenda {
+// @@schema("agro")
+// }
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// model fazenda_usuario {
+// @@schema("agro")
+// }
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model convite {
+  id                                   BigInt    @id @default(autoincrement())
+  empresa_id                           BigInt
+  fazenda_id                           BigInt?
+  perfil                               String
+  token_hash                           Bytes
+  code                                 String?   @unique
+  invited_email                        String?
+  max_uses                             Int       @default(1)
+  used_count                           Int       @default(0)
+  expires_at                           DateTime? @db.Timestamp(6)
+  created_by                           BigInt
+  created_at                           DateTime  @default(now()) @db.Timestamp(6)
+  consumed_by                          BigInt?
+  consumed_at                          DateTime? @db.Timestamp(6)
+  usuario_convite_consumed_byTousuario usuario?  @relation("convite_consumed_byTousuario", fields: [consumed_by], references: [id], onUpdate: NoAction)
+  usuario_convite_created_byTousuario  usuario   @relation("convite_created_byTousuario", fields: [created_by], references: [id], onUpdate: NoAction)
+  empresa                              empresa   @relation(fields: [empresa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([empresa_id], map: "idx_convite_empresa")
+  @@index([expires_at], map: "idx_convite_expires_at")
+  @@index([fazenda_id], map: "idx_convite_fazenda")
+  @@schema("app")
+}
+
+model documento {
+  id               BigInt             @id @default(autoincrement())
+  tipo_documento   BigInt?
+  identificador    String?
+  documento_tipo   documento_tipo?    @relation(fields: [tipo_documento], references: [id], onDelete: Restrict, map: "fk_documento_tipo")
+  documento_pessoa documento_pessoa[] @ignore
+
+  @@schema("app")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model documento_pessoa {
+  id           BigInt    @default(autoincrement())
+  id_pessoa    BigInt
+  id_documento BigInt
+  documento    documento @relation(fields: [id_documento], references: [id], map: "documento_pessoa_documento_fk")
+  pessoa       pessoa    @relation(fields: [id_pessoa], references: [id], map: "documento_pessoa_pessoa_fk")
+
+  @@index([id_documento], map: "idx_docp_documento")
+  @@index([id_pessoa], map: "idx_docp_pessoa")
+  @@ignore
+  @@schema("app")
+}
+
+model documento_tipo {
+  id             BigInt      @id @default(autoincrement())
+  tipo_documento String?
+  documento      documento[]
+
+  @@schema("app")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model empresa {
+  id              BigInt            @id @default(autoincrement())
+  razao_social    String
+  fantasia        String?
+  cnpj            String            @unique @db.VarChar(14)
+  ativo           Boolean           @default(true)
+  criado          DateTime          @default(now()) @db.Timestamp(6)
+  convite         convite[]
+  usuario_empresa usuario_empresa[]
+
+  @@schema("app")
+}
+
+model endereco {
+  id              BigInt            @id @default(autoincrement())
+  cep             String?
+  logradouro      String?
+  numero          String?
+  complemento     String?
+  bairro          String?
+  municipio       String?
+  uf              String?           @db.Char(2)
+  referencia      String?
+  ativo           Boolean           @default(true)
+  criado_em       DateTime          @default(now()) @db.Timestamp(6)
+  atualizado_em   DateTime          @default(now()) @db.Timestamp(6)
+  pessoa_endereco pessoa_endereco[]
+
+  @@schema("app")
+}
+
+model pessoa {
+  id               BigInt             @id @default(autoincrement())
+  nome             String?
+  contato          String?
+  email            String?
+  tipo_pessoa      String?
+  ativo            Boolean            @default(true)
+  criado_em        DateTime           @default(now()) @db.Timestamp(6)
+  atualizado_em    DateTime           @default(now()) @db.Timestamp(6)
+  documento_pessoa documento_pessoa[] @ignore
+  pessoa_endereco  pessoa_endereco[]
+
+  @@schema("app")
+}
+
+model pessoa_endereco {
+  id          BigInt   @id @default(autoincrement())
+  pessoa_id   BigInt
+  endereco_id BigInt
+  tipo        String?
+  principal   Boolean  @default(false)
+  criado_em   DateTime @default(now()) @db.Timestamp(6)
+  endereco    endereco @relation(fields: [endereco_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  pessoa      pessoa   @relation(fields: [pessoa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([pessoa_id, endereco_id], map: "pessoa_endereco_unq")
+  @@index([endereco_id], map: "idx_pessoa_endereco_endereco")
+  @@index([pessoa_id, principal(sort: Desc)], map: "idx_pessoa_endereco_pessoa")
+  @@schema("app")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model usuario {
+  id                                   BigInt            @id @default(autoincrement())
+  nome                                 String            @db.VarChar(50)
+  email                                String?           @unique @db.VarChar(150)
+  telefone                             String?           @unique @db.VarChar(20)
+  ativo                                Boolean           @default(true)
+  criado                               DateTime          @default(now()) @db.Timestamp(6)
+  atualizado                           DateTime?         @db.Timestamp(6)
+  documento                            String            @unique(map: "usuario_documento")
+  convite_convite_consumed_byTousuario convite[]         @relation("convite_consumed_byTousuario")
+  convite_convite_created_byTousuario  convite[]         @relation("convite_created_byTousuario")
+  usuario_empresa                      usuario_empresa[]
+
+  @@schema("app")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model usuario_empresa {
+  id         BigInt   @id @default(autoincrement())
+  usuario_id BigInt
+  empresa_id BigInt
+  perfil     String
+  criado     DateTime @default(now()) @db.Timestamp(6)
+  empresa    empresa  @relation(fields: [empresa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuario    usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([usuario_id, empresa_id])
+  @@unique([usuario_id, empresa_id], map: "ux_usuario_empresa")
+  @@schema("app")
+}
