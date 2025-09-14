@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Debug do backend
+      "type": "node",
+      "request": "launch",
+      "name": "Debug API (Node)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "debug"],
+      "cwd": "${workspaceFolder}/agrosync-api", 
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**"],
+      "sourceMaps": true
+    },
+    {
+      // Debug do frontend (React)
+      "type": "chrome",
+      "request": "launch",
+      "name": "Debug Web (React)",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/agrosync-web/src"
+    }
+  ]
+}
