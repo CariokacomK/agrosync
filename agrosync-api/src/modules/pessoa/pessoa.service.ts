@@ -20,8 +20,12 @@ class PessoaService {
     return pessoaRepository.update(id, data);
   }
 
-  async deletarPessoa(id: number) {
-    return pessoaRepository.delete(id);
+  async desativarPessoa(id: number) {
+    const pessoa = await this.buscarPessoa(id);
+  
+    pessoa.ativo = false;
+
+    return pessoaRepository.update(id, pessoa);
   }
 }
 
