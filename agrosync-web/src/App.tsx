@@ -1,13 +1,23 @@
-import Sidebar from "./components/Sidebar.tsx";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import DashboardLayout from './layouts/DashboardLayout';
+import HomePage from './pages/Home';
+import UserManagementPage from './pages/users/UserManagement';
 
 function App() {
   return (
-    <div style={{ display: "flex" }}>
-      <Sidebar />
-      <main style={{ flexGrow: 1, padding: "20px" }}>
-        <h1>Bem-vindo ao Agro Sync</h1>
-      </main>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* Rota para a página de Login (exemplo) */}
+        {/* <Route path="/login" element={ <LoginPage /> } /> */}
+
+        {/* Rotas que usam o Layout com a Sidebar */}
+        <Route element={<DashboardLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/usuarios" element={<UserManagementPage />} />
+          {/* Adicione outras rotas aqui, como "/relatorios", etc. */}
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
