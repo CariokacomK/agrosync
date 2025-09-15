@@ -4,7 +4,7 @@ import {
     Checkbox, Avatar, Box, Typography, Chip, IconButton
 } from '@mui/material';
 import {
-    DragHandle as DragHandleIcon, // Ícone de menu correto
+    DragHandle as DragHandleIcon,
     PersonOutlined as PersonIcon,
     VpnKeyOutlined as VpnKeyIcon,
     ScheduleOutlined as ScheduleIcon,
@@ -12,18 +12,16 @@ import {
 } from '@mui/icons-material';
 import type { User } from '../../pages/users/UserManagement';
 
-// Cores customizadas e mais suaves para os chips
 const accessChipStyles = {
     'Administrador': { backgroundColor: '#FFDCE0', color: '#D32F2F', fontWeight: 600 },
     'Gestor': { backgroundColor: '#FFF0C7', color: '#E69800', fontWeight: 600 },
     'Usuário': { backgroundColor: '#D6EFFF', color: '#1976D2', fontWeight: 600 },
 };
 
-// Componente para o ícone do cabeçalho
 const HeaderIcon = ({ children }: { children: React.ReactNode }) => (
     <Box sx={{
-        width: 32, height: 32, borderRadius: '50%', backgroundColor: '#F4F5F7',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 1
+        width: 32, height: 32, borderRadius: '50%', display: 'flex',
+        alignItems: 'center', justifyContent: 'center', mr: 1
     }}>
         {children}
     </Box>
@@ -39,19 +37,18 @@ const UserTable: React.FC<UserTableProps> = ({ users }) => {
             <Box
                 sx={{
                     display: 'flex', alignItems: 'center', p: 1.5,
-                    backgroundColor: '#F4F5F7', borderRadius: '12px',
+                    backgroundColor: '#2857221A', borderRadius: '12px',
                     fontWeight: 'bold', color: 'text.secondary', fontSize: '0.875rem'
                 }}
             >
                 <Box sx={{ width: '5%', textAlign: 'center' }}><Checkbox size="small" sx={{p:0}} /></Box>
-                <Box sx={{ width: '30%', display: 'flex', alignItems: 'center' }}><HeaderIcon><PersonIcon fontSize="small"/></HeaderIcon> Usuário</Box>
+                <Box sx={{ width: '30%', display: 'flex', alignItems: 'center'}}><HeaderIcon><PersonIcon fontSize="small"/></HeaderIcon> Usuário</Box>
                 <Box sx={{ width: '15%', display: 'flex', alignItems: 'center' }}><HeaderIcon><VpnKeyIcon fontSize="small"/></HeaderIcon> Acesso</Box>
                 <Box sx={{ width: '20%', display: 'flex', alignItems: 'center' }}><HeaderIcon><ScheduleIcon fontSize="small"/></HeaderIcon> Última atividade</Box>
                 <Box sx={{ width: '20%', display: 'flex', alignItems: 'center' }}><HeaderIcon><DateRangeIcon fontSize="small"/></HeaderIcon> Data de Inclusão</Box>
                 <Box sx={{ width: '10%' }}></Box>
             </Box>
 
-            {/* 2. TABELA SEM CABEÇALHO, SÓ COM O CORPO */}
             <TableContainer>
                 <Table sx={{ borderCollapse: 'separate', borderSpacing: '0 12px' }}>
                     <TableBody>

@@ -30,15 +30,15 @@ const UserManagementPage: React.FC = () => {
                     <Link underline="none" color="text.secondary" href="/usuarios">Usuários & Permissões</Link>
                     <Typography color="text.primary" sx={{ fontSize: '0.875rem' }}>Gerenciador</Typography>
                 </Breadcrumbs>
-                <Typography variant="h5" fontWeight="bold">Gerenciador de Usuários</Typography>
+                <Typography variant="h5" fontWeight="bold" color='text.primary'>Gerenciador de Usuários</Typography>
                 <Typography color="text.secondary" variant="body2">Gerencie sua equipe e as permissões de conta aqui.</Typography>
             </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="body1" fontWeight="bold">
+                <Typography variant="body1" fontWeight="bold" color='text.secondary'>
                     Total de Usuários <span style={{ color: '#2e7d32' }}>{mockUsers.length}</span>
                 </Typography>
-                <Box sx={{ display: 'flex', gap: 1.5 }}>
+                <Box sx={{ display: 'flex', gap: 1.5}}>
                     <TextField
                         size="small"
                         placeholder="Pesquisar"

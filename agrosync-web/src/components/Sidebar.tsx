@@ -62,7 +62,7 @@ const Sidebar: React.FC = () => {
         },
     };
 
-    const drawerWidthOpen = 240;
+    const drawerWidthOpen = 350;
     const drawerWidthClosed = 80;
 
     const UserSubmenu = (
