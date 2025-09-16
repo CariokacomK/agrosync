@@ -2,6 +2,7 @@ import { Add as AddIcon, FilterList as FilterListIcon } from '@mui/icons-materia
 import { Box, Breadcrumbs, Button, Link, Pagination, TextField, Typography } from '@mui/material';
 import React from 'react';
 import UserTable from '../../components/users/UserTable';
+import { usePessoaService } from '../../services/pessoa.service';
 
 export type User = {
     id: number;
@@ -22,11 +23,35 @@ export const mockUsers: User[] = [
 ];
 
 const UserManagementPage: React.FC = () => {
+    const pessoaService = usePessoaService();
+
+    React.useEffect(() => {
+        let mounted = true;
+
+        (async () => {
+            try {
+                const resp = await pessoaService.findList(null);
+
+                console.log('[API] pessoa.findList response (AxiosResponse):', resp);
+                console.log('[API] pessoa.findList response.data:', resp.data);
+
+                if (resp.data && (resp.data as any).content) {
+                    console.log('[API] pessoa.findList content:', (resp.data as any).content);
+                    console.log('[API] quantidade de itens retornados:', (resp.data as any).content.length);
+                }
+            } catch (err) {
+                console.error('[API] erro em pessoa.findList:', err);
+            }
+        })();
+
+        return () => { mounted = false; };
+    }, [pessoaService]);
+
     return (
         <Box sx={{ flexGrow: 1, p: 3, display: 'flex', flexDirection: 'column', gap: 2.5, backgroundColor: '#fff', borderRadius: 9, boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
             <Box>
                 <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2, fontSize: '0.875rem' }}>
-                    <Link underline="none" color="text.secondary"  href="/" sx={{'&:hover': {textDecoration: 'none'}}}>Agro Sync</Link>
+                    <Link underline="none" color="text.secondary" href="/" sx={{ '&:hover': { textDecoration: 'none' } }}>Agro Sync</Link>
                     <Link underline="none" color="text.secondary" href="/usuarios">Usuários & Permissões</Link>
                     <Typography color="text.primary" sx={{ fontSize: '0.875rem' }}>Gerenciador</Typography>
                 </Breadcrumbs>
@@ -38,7 +63,7 @@ const UserManagementPage: React.FC = () => {
                 <Typography variant="body1" fontWeight="bold" color='text.secondary'>
                     Total de Usuários <span style={{ color: '#2e7d32' }}>{mockUsers.length}</span>
                 </Typography>
-                <Box sx={{ display: 'flex', gap: 1.5}}>
+                <Box sx={{ display: 'flex', gap: 1.5 }}>
                     <TextField
                         size="small"
                         placeholder="Pesquisar"
@@ -64,7 +89,7 @@ const UserManagementPage: React.FC = () => {
             <Box sx={{ display: 'flex', justifyContent: 'center', pt: 2 }}>
                 <Pagination
                     count={10}
-                    variant="text" 
+                    variant="text"
                     shape="rounded"
                     color="primary"
                     sx={{
