@@ -3,8 +3,12 @@ import { UsuarioDTO } from "./usuario.types";
 
 class UsuarioService {
   async criarUsuario(data: UsuarioDTO) {
-    // Regras de negócio → impedir duplicação
+    if(await this.validarUsuario(data)) return usuarioRepository.create(data);
+  }
+
+  private async validarUsuario(data: UsuarioDTO) {
     const existeEmail = await usuarioRepository.findAll();
+
     if (existeEmail.some(u => u.email === data.email)) {
       throw new Error("Já existe um usuário com este email");
     }
@@ -14,7 +18,7 @@ class UsuarioService {
       throw new Error("Já existe um usuário com este documento");
     }
 
-    return usuarioRepository.create(data);
+    return (existeEmail || existeDocumento ? false : true);
   }
 
   async listarUsuarios() {

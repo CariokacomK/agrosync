@@ -5,10 +5,10 @@ import { PessoaSchema } from "../modules/pessoa/pessoa.schema";
 
 const router = Router();
 
-router.post("/", validateBody(PessoaSchema), pessoaController.criarPessoa);
-router.get("/:id", pessoaController.buscarPessoa);
-router.get("/", pessoaController.listarPessoas);
-router.delete("/:id", pessoaController.desativarPessoa);
-router.patch("/:id", validateBody(PessoaSchema), pessoaController.atualizarPessoa);
+router.post("/pessoa", validateBody(PessoaSchema), pessoaController.criarPessoa);
+router.get("/pessoa/:id", pessoaController.buscarPessoa);
+router.get("/pessoa", pessoaController.listarPessoas);
+router.delete("/pessoa/:id", pessoaController.desativarPessoa);
+router.patch("/pessoa/:id", validateBody(PessoaSchema), pessoaController.atualizarPessoa);
 
 export default router;

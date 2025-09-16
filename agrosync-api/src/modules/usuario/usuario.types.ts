@@ -7,5 +7,4 @@ export interface UsuarioDTO {
   ativo?: boolean;
   criado?: Date;
   atualizado?: Date | null;
-  senha?: string; // opcional :( nao exist coluna no banco
 }

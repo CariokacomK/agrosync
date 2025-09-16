@@ -2,15 +2,10 @@ import express from "express";
 import pessoaRoutes from "./pessoa.routes";
 import usuarioRoutes from "./usuario.routes";
 
-const router = express.Router();
+const routes = (app: any) => {
+  app.route("/").get((req: any, res: any) => res.send("Api funcionando"));
 
-// rota de teste inicial
-router.get("/", (req, res) => {
-  res.send("API Agrosync funcionando!");
-});
+  app.use(express.json(), pessoaRoutes, usuarioRoutes)
+};
 
-// rotas de módulos
-router.use("/pessoa", pessoaRoutes);
-router.use("/usuario", usuarioRoutes);
-
-export default router;
+export default routes;

@@ -5,10 +5,10 @@ import { UsuarioSchema } from "../modules/usuario/usuario.schema";
 
 const router = Router();
 
-router.post("/", validateBody(UsuarioSchema), usuarioController.criarUsuario);
-router.get("/:id", usuarioController.buscarUsuario);
-router.get("/", usuarioController.listarUsuarios);
-router.delete("/:id", usuarioController.desativarUsuario);
-router.patch("/:id", validateBody(UsuarioSchema), usuarioController.atualizarUsuario);
+router.post("/usuario", validateBody(UsuarioSchema), usuarioController.criarUsuario);
+router.get("/usuario/:id", usuarioController.buscarUsuario);
+router.get("/usuario", usuarioController.listarUsuarios);
+router.delete("/usuario/:id", usuarioController.desativarUsuario);
+router.patch("/usuario/:id", validateBody(UsuarioSchema), usuarioController.atualizarUsuario);
 
 export default router;
