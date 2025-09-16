@@ -3,108 +3,115 @@ import { Box, Breadcrumbs, Button, Link, Pagination, TextField, Typography } fro
 import React from 'react';
 import UserTable from '../../components/users/UserTable';
 import { usePessoaService } from '../../services/pessoa.service';
-
-export type User = {
-    id: number;
-    name: string;
-    email: string;
-    avatarUrl?: string;
-    access: 'Administrador' | 'Gestor' | 'Usuário';
-    lastActivity: string;
-    includeDate: string;
-};
-
-export const mockUsers: User[] = [
-    { id: 1, name: 'Rodrigo Rossetto', email: 'rodrigorossetto@gmail.com', access: 'Administrador', lastActivity: '10 de set, 2025', includeDate: '4 de ago, 2025' },
-    { id: 2, name: 'Nicolas Maran', email: 'nicolasmaran@gmail.com', access: 'Usuário', lastActivity: '10 de set, 2025', includeDate: '4 de ago, 2025' },
-    { id: 3, name: 'Gabriel Borges', email: 'gabrielborges@gmail.com', access: 'Gestor', lastActivity: '10 de set, 2025', includeDate: '4 de ago, 2025' },
-    { id: 4, name: 'Bruno Zotarelli', email: 'bruno@gmail.com', access: 'Usuário', lastActivity: '09 de set, 2025', includeDate: '4 de ago, 2025' },
-    { id: 5, name: 'Maria Pavezi', email: 'maria@gmail.com', access: 'Usuário', lastActivity: '08 de set, 2025', includeDate: '3 de ago, 2025' },
-];
+import type { IPessoaDTO } from '../../models/pessoa.model';
 
 const UserManagementPage: React.FC = () => {
-    const pessoaService = usePessoaService();
+  const pessoaService = usePessoaService();
+  const [users, setUsers] = React.useState<IPessoaDTO[]>([]);
 
-    React.useEffect(() => {
-        let mounted = true;
+  React.useEffect(() => {
+    let mounted = true;
 
-        (async () => {
-            try {
-                const resp = await pessoaService.findList(null);
+    (async () => {
+      try {
+        const resp = await pessoaService.findList(null);
 
-                console.log('[API] pessoa.findList response (AxiosResponse):', resp);
-                console.log('[API] pessoa.findList response.data:', resp.data);
+        if (mounted && resp.data) {
+          const lista: IPessoaDTO[] = (resp.data as any).content ?? resp.data;
+          setUsers(lista);
+        }
+      } catch (err) {
+        console.error('[API] erro em pessoa.findList:', err);
+      }
+    })();
 
-                if (resp.data && (resp.data as any).content) {
-                    console.log('[API] pessoa.findList content:', (resp.data as any).content);
-                    console.log('[API] quantidade de itens retornados:', (resp.data as any).content.length);
-                }
-            } catch (err) {
-                console.error('[API] erro em pessoa.findList:', err);
-            }
-        })();
+    return () => {
+      mounted = false;
+    };
+  }, [pessoaService]);
 
-        return () => { mounted = false; };
-    }, [pessoaService]);
+  return (
+    <Box
+      sx={{
+        flexGrow: 1,
+        p: 3,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2.5,
+        backgroundColor: '#fff',
+        borderRadius: 9,
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      }}
+    >
+      <Box>
+        <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2, fontSize: '0.875rem' }}>
+          <Link underline="none" color="text.secondary" href="/" sx={{ '&:hover': { textDecoration: 'none' } }}>
+            Agro Sync
+          </Link>
+          <Link underline="none" color="text.secondary" href="/usuarios">
+            Usuários & Permissões
+          </Link>
+          <Typography color="text.primary" sx={{ fontSize: '0.875rem' }}>
+            Gerenciador
+          </Typography>
+        </Breadcrumbs>
+        <Typography variant="h5" fontWeight="bold" color="text.primary">
+          Gerenciador de Usuários
+        </Typography>
+        <Typography color="text.secondary" variant="body2">
+          Gerencie sua equipe e as permissões de conta aqui.
+        </Typography>
+      </Box>
 
-    return (
-        <Box sx={{ flexGrow: 1, p: 3, display: 'flex', flexDirection: 'column', gap: 2.5, backgroundColor: '#fff', borderRadius: 9, boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-            <Box>
-                <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2, fontSize: '0.875rem' }}>
-                    <Link underline="none" color="text.secondary" href="/" sx={{ '&:hover': { textDecoration: 'none' } }}>Agro Sync</Link>
-                    <Link underline="none" color="text.secondary" href="/usuarios">Usuários & Permissões</Link>
-                    <Typography color="text.primary" sx={{ fontSize: '0.875rem' }}>Gerenciador</Typography>
-                </Breadcrumbs>
-                <Typography variant="h5" fontWeight="bold" color='text.primary'>Gerenciador de Usuários</Typography>
-                <Typography color="text.secondary" variant="body2">Gerencie sua equipe e as permissões de conta aqui.</Typography>
-            </Box>
-
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="body1" fontWeight="bold" color='text.secondary'>
-                    Total de Usuários <span style={{ color: '#2e7d32' }}>{mockUsers.length}</span>
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 1.5 }}>
-                    <TextField
-                        size="small"
-                        placeholder="Pesquisar"
-                    />
-                    <Button variant="outlined" startIcon={<FilterListIcon />} sx={{ borderRadius: '8px', color: 'text.primary', borderColor: '#e0e0e0' }}>Filtro</Button>
-                    <Button
-                        variant="contained"
-                        startIcon={<AddIcon />}
-                        disableElevation
-                        sx={{
-                            borderRadius: '8px',
-                            backgroundColor: '#2e7d32',
-                            '&:hover': { backgroundColor: '#1b5e20' }
-                        }}
-                    >
-                        Adicionar Usuário
-                    </Button>
-                </Box>
-            </Box>
-
-            <UserTable users={mockUsers} />
-
-            <Box sx={{ display: 'flex', justifyContent: 'center', pt: 2 }}>
-                <Pagination
-                    count={10}
-                    variant="text"
-                    shape="rounded"
-                    color="primary"
-                    sx={{
-                        '& .MuiPaginationItem-root': {
-                            fontWeight: 'medium'
-                        },
-                        '& .Mui-selected': {
-                            backgroundColor: 'rgba(46, 125, 50, 0.1) !important',
-                            color: '#2e7d32'
-                        }
-                    }}
-                />
-            </Box>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="body1" fontWeight="bold" color="text.secondary">
+          Total de Usuários <span style={{ color: '#2e7d32' }}>{users.length}</span>
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1.5 }}>
+          <TextField size="small" placeholder="Pesquisar" />
+          <Button
+            variant="outlined"
+            startIcon={<FilterListIcon />}
+            sx={{ borderRadius: '8px', color: 'text.primary', borderColor: '#e0e0e0' }}
+          >
+            Filtro
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            disableElevation
+            sx={{
+              borderRadius: '8px',
+              backgroundColor: '#2e7d32',
+              '&:hover': { backgroundColor: '#1b5e20' },
+            }}
+          >
+            Adicionar Usuário
+          </Button>
         </Box>
-    );
+      </Box>
+
+      <UserTable users={users} />
+
+      <Box sx={{ display: 'flex', justifyContent: 'center', pt: 2 }}>
+        <Pagination
+          count={10}
+          variant="text"
+          shape="rounded"
+          color="primary"
+          sx={{
+            '& .MuiPaginationItem-root': {
+              fontWeight: 'medium',
+            },
+            '& .Mui-selected': {
+              backgroundColor: 'rgba(46, 125, 50, 0.1) !important',
+              color: '#2e7d32',
+            },
+          }}
+        />
+      </Box>
+    </Box>
+  );
 };
 
 export default UserManagementPage;
