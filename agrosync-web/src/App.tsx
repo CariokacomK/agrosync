@@ -1,31 +1,24 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './styles/App.css'
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import DashboardLayout from './layouts/DashboardLayout';
+import HomePage from './pages/Home';
+import UserManagementPage from './pages/users/UserManagement';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <BrowserRouter>
+      <Routes>
+        {/* Rota para a página de Login (exemplo) */}
+        {/* <Route path="/login" element={ <LoginPage /> } /> */}
+
+        {/* Rotas que usam o Layout com a Sidebar */}
+        <Route element={<DashboardLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/usuarios" element={<UserManagementPage />} />
+          {/* Adicione outras rotas aqui, como "/relatorios", etc. */}
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
