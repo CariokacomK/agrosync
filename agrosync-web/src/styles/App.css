@@ -5,6 +5,14 @@
   text-align: center;
 }
 
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden; /* Impede o scroll no corpo da página */
+  font-family: 'Inter', sans-serif; 
+}
 .logo {
   height: 6em;
   padding: 1.5em;
