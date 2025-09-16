@@ -9,6 +9,10 @@ const PORT = process.env.PORT || 3001;
   return this.toString();
 };
 
+(BigInt.prototype as any).toJSON = function () {
+  return this.toString();
+};
+
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
     
