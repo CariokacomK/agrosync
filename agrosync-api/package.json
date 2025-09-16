@@ -8,8 +8,7 @@
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "debug": "ts-node-dev --inspect --respawn --transpile-only src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
-    "db:test": "ts-node src/infra/database/testConnection.ts"
+    "start": "node dist/server.js"
   },
   "keywords": [],
   "author": "",
