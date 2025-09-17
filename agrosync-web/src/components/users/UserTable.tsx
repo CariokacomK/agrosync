@@ -4,13 +4,12 @@ import {
   Checkbox, Avatar, Box, Typography, Chip, IconButton
 } from '@mui/material';
 import {
-  DragHandle as DragHandleIcon,
+  Edit as EditIcon,
   PersonOutlined as PersonIcon,
   VpnKeyOutlined as VpnKeyIcon,
   ScheduleOutlined as ScheduleIcon,
   DateRangeOutlined as DateRangeIcon,
 } from '@mui/icons-material';
-import type { IPessoaDTO } from '../../models/pessoa.model';
 
 const statusChipStyles = {
   ativo: { backgroundColor: '#D6EFFF', color: '#1976D2', fontWeight: 600 },
@@ -26,11 +25,22 @@ const HeaderIcon = ({ children }: { children: React.ReactNode }) => (
   </Box>
 );
 
+export type DisplayUser = {
+  id: string;
+  nome: string;
+  email?: string | null;
+  tipo_pessoa?: string | null;
+  ativo?: boolean;
+  criado_em?: string | Date | null;
+  atualizado_em?: string | Date | null;
+};
+
 interface UserTableProps {
-  users: IPessoaDTO[];
+  users: DisplayUser[];
+  onEdit?: (user: DisplayUser) => void;
 }
 
-const UserTable: React.FC<UserTableProps> = ({ users }) => {
+const UserTable: React.FC<UserTableProps> = ({ users, onEdit }) => {
   return (
     <Box>
       <Box
@@ -54,7 +64,7 @@ const UserTable: React.FC<UserTableProps> = ({ users }) => {
           <TableBody>
             {users.map((user) => (
               <TableRow
-                key={user.id.toString()}
+                key={user.id}
                 sx={{
                   backgroundColor: 'white',
                   boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
@@ -77,7 +87,7 @@ const UserTable: React.FC<UserTableProps> = ({ users }) => {
                 </TableCell>
 
                 <TableCell width="15%">
-                  {user.tipo_pessoa === 'J' ? 'Jurídica' : 'Física'}
+                  {user.tipo_pessoa === 'J' || user.tipo_pessoa === 'Jurídica' ? 'Jurídica' : 'Física'}
                 </TableCell>
 
                 <TableCell width="15%">
@@ -97,7 +107,9 @@ const UserTable: React.FC<UserTableProps> = ({ users }) => {
                 </TableCell>
 
                 <TableCell width="10%" align="center" sx={{ borderRadius: '0 12px 12px 0' }}>
-                  <IconButton size="small"><DragHandleIcon /></IconButton>
+                  <IconButton size="small" onClick={() => onEdit?.(user)} title="Editar">
+                    <EditIcon />
+                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}

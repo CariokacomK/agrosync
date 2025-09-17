@@ -8,19 +8,6 @@ datasource db {
   schemas  = ["agro", "app"]
 }
 
-/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-// model fazenda {
-// @@schema("agro")
-// }
-
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-// model fazenda_usuario {
-// @@schema("agro")
-// }
-
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model convite {
   id                                   BigInt    @id @default(autoincrement())
@@ -40,6 +27,7 @@ model convite {
   usuario_convite_consumed_byTousuario usuario?  @relation("convite_consumed_byTousuario", fields: [consumed_by], references: [id], onUpdate: NoAction)
   usuario_convite_created_byTousuario  usuario   @relation("convite_created_byTousuario", fields: [created_by], references: [id], onUpdate: NoAction)
   empresa                              empresa   @relation(fields: [empresa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  fazenda                              fazenda?  @relation(fields: [fazenda_id], references: [id], onUpdate: NoAction)
 
   @@index([empresa_id], map: "idx_convite_empresa")
   @@index([expires_at], map: "idx_convite_expires_at")
@@ -87,6 +75,7 @@ model empresa {
   cnpj            String            @unique @db.VarChar(14)
   ativo           Boolean           @default(true)
   criado          DateTime          @default(now()) @db.Timestamp(6)
+  fazenda         fazenda[]
   convite         convite[]
   usuario_empresa usuario_empresa[]
 
@@ -122,6 +111,7 @@ model pessoa {
   atualizado_em    DateTime           @default(now()) @db.Timestamp(6)
   documento_pessoa documento_pessoa[] @ignore
   pessoa_endereco  pessoa_endereco[]
+  usuario          usuario[]
 
   @@schema("app")
 }
@@ -152,9 +142,12 @@ model usuario {
   ativo                                Boolean           @default(true)
   criado                               DateTime          @default(now()) @db.Timestamp(6)
   atualizado                           DateTime?         @db.Timestamp(6)
-  documento                            String            @unique(map: "usuario_documento")
+  documento                            String?           @ignore
+  pessoa_id                            BigInt?
+  fazenda_usuario                      fazenda_usuario[]
   convite_convite_consumed_byTousuario convite[]         @relation("convite_consumed_byTousuario")
   convite_convite_created_byTousuario  convite[]         @relation("convite_created_byTousuario")
+  pessoa                               pessoa?           @relation(fields: [pessoa_id], references: [id], onUpdate: NoAction, map: "fk_usuario_pessoa")
   usuario_empresa                      usuario_empresa[]
 
   @@schema("app")
@@ -173,4 +166,36 @@ model usuario_empresa {
   @@unique([usuario_id, empresa_id])
   @@unique([usuario_id, empresa_id], map: "ux_usuario_empresa")
   @@schema("app")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model fazenda {
+  id              BigInt            @id @default(autoincrement())
+  empresa_id      BigInt
+  nome            String
+  codigo          String?           @unique
+  criado          DateTime          @default(now()) @db.Timestamp(6)
+  empresa         empresa           @relation(fields: [empresa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  fazenda_usuario fazenda_usuario[]
+  convite         convite[]
+
+  @@index([empresa_id], map: "idx_fazenda_empresa")
+  @@schema("agro")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model fazenda_usuario {
+  id         BigInt   @id @default(autoincrement())
+  fazenda_id BigInt
+  usuario_id BigInt
+  perfil     String
+  criado     DateTime @default(now()) @db.Timestamp(6)
+  fazenda    fazenda  @relation(fields: [fazenda_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuario    usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([fazenda_id, usuario_id])
+  @@index([fazenda_id], map: "idx_fazenda_usuario_fazenda")
+  @@index([usuario_id], map: "idx_fazenda_usuario_usuario")
+  @@schema("agro")
 }
