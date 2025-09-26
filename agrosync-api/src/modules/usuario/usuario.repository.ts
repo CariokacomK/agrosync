@@ -3,7 +3,7 @@ import { UsuarioDTO } from "./usuario.types";
 
 class UsuarioRepository {
   async create(data: UsuarioDTO) {
-    return prisma.usuario.create({ data });
+    return prisma.usuario.create({ data: data as any });
   }
 
   async findAll() {
@@ -15,7 +15,7 @@ class UsuarioRepository {
   }
 
   async update(id: number, data: UsuarioDTO) {
-    return prisma.usuario.update({ where: { id }, data });
+    return prisma.usuario.update({ where: { id }, data: data as any });
   }
 
   async delete(id: number) {
