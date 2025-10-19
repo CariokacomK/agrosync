@@ -1,8 +1,8 @@
 import prisma from "../../infra/database/client";
-import { PessoaDTO } from "./pessoa.types";
+import { Pessoa } from "./pessoa.types";
 
 class PessoaRepository{
-    async create(data: PessoaDTO) {
+    async create(data: Pessoa) {
     return prisma.pessoa.create({ data });
   }
 
@@ -14,7 +14,7 @@ class PessoaRepository{
     return prisma.pessoa.findUnique({ where: { id } });
   }
 
-  async update(id: number, data: PessoaDTO) {
+  async update(id: number, data: Pessoa) {
     return prisma.pessoa.update({ where: { id }, data });
   }
 

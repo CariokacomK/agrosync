@@ -1,8 +1,8 @@
 import pessoaRepository from "./pessoa.repository";
-import { PessoaDTO } from "./pessoa.types";
+import { Pessoa } from "./pessoa.types";
 
 class PessoaService {
-    async criarPessoa(data: PessoaDTO) {
+    async criarPessoa(data: Pessoa) {
     return pessoaRepository.create(data);
   }
 
@@ -16,7 +16,7 @@ class PessoaService {
     return pessoa;
   }
 
-  async atualizarPessoa(id: number, data: PessoaDTO) {
+  async atualizarPessoa(id: number, data: Pessoa) {
     return pessoaRepository.update(id, data);
   }
 

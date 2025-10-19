@@ -5,7 +5,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["agro", "app"]
+  schemas  = ["agro", "app", "auth", "catalogo"]
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -26,8 +26,6 @@ model convite {
   consumed_at                          DateTime? @db.Timestamp(6)
   usuario_convite_consumed_byTousuario usuario?  @relation("convite_consumed_byTousuario", fields: [consumed_by], references: [id], onUpdate: NoAction)
   usuario_convite_created_byTousuario  usuario   @relation("convite_created_byTousuario", fields: [created_by], references: [id], onUpdate: NoAction)
-  empresa                              empresa   @relation(fields: [empresa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  fazenda                              fazenda?  @relation(fields: [fazenda_id], references: [id], onUpdate: NoAction)
 
   @@index([empresa_id], map: "idx_convite_empresa")
   @@index([expires_at], map: "idx_convite_expires_at")
@@ -40,7 +38,7 @@ model documento {
   tipo_documento   BigInt?
   identificador    String?
   documento_tipo   documento_tipo?    @relation(fields: [tipo_documento], references: [id], onDelete: Restrict, map: "fk_documento_tipo")
-  documento_pessoa documento_pessoa[] @ignore
+  documento_pessoa documento_pessoa[]
 
   @@schema("app")
 }
@@ -53,9 +51,9 @@ model documento_pessoa {
   documento    documento @relation(fields: [id_documento], references: [id], map: "documento_pessoa_documento_fk")
   pessoa       pessoa    @relation(fields: [id_pessoa], references: [id], map: "documento_pessoa_pessoa_fk")
 
+  @@id([id_pessoa, id_documento])
   @@index([id_documento], map: "idx_docp_documento")
   @@index([id_pessoa], map: "idx_docp_pessoa")
-  @@ignore
   @@schema("app")
 }
 
@@ -69,15 +67,18 @@ model documento_tipo {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model empresa {
-  id              BigInt            @id @default(autoincrement())
-  razao_social    String
-  fantasia        String?
-  cnpj            String            @unique @db.VarChar(14)
-  ativo           Boolean           @default(true)
-  criado          DateTime          @default(now()) @db.Timestamp(6)
-  fazenda         fazenda[]
-  convite         convite[]
-  usuario_empresa usuario_empresa[]
+  id                  Int       @id @default(autoincrement())
+  nome                String
+  cnpj                String    @unique
+  fantasia            String?
+  telefone            String?
+  email               String?
+  endereco            Int?
+  data_criacao        DateTime? @default(now()) @db.Timestamp(6)
+  ativa               Boolean?  @default(true)
+  data_alteracao      DateTime? @default(now()) @db.Timestamp(6)
+  usuario_responsavel BigInt?
+  usuario             usuario?  @relation(fields: [usuario_responsavel], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_usuario")
 
   @@schema("app")
 }
@@ -109,7 +110,8 @@ model pessoa {
   ativo            Boolean            @default(true)
   criado_em        DateTime           @default(now()) @db.Timestamp(6)
   atualizado_em    DateTime           @default(now()) @db.Timestamp(6)
-  documento_pessoa documento_pessoa[] @ignore
+  documento        String?
+  documento_pessoa documento_pessoa[]
   pessoa_endereco  pessoa_endereco[]
   usuario          usuario[]
 
@@ -135,67 +137,368 @@ model pessoa_endereco {
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model usuario {
-  id                                   BigInt            @id @default(autoincrement())
-  nome                                 String            @db.VarChar(50)
-  email                                String?           @unique @db.VarChar(150)
-  telefone                             String?           @unique @db.VarChar(20)
-  ativo                                Boolean           @default(true)
-  criado                               DateTime          @default(now()) @db.Timestamp(6)
-  atualizado                           DateTime?         @db.Timestamp(6)
-  documento                            String?           @ignore
-  pessoa_id                            BigInt?
-  fazenda_usuario                      fazenda_usuario[]
-  convite_convite_consumed_byTousuario convite[]         @relation("convite_consumed_byTousuario")
-  convite_convite_created_byTousuario  convite[]         @relation("convite_created_byTousuario")
-  pessoa                               pessoa?           @relation(fields: [pessoa_id], references: [id], onUpdate: NoAction, map: "fk_usuario_pessoa")
-  usuario_empresa                      usuario_empresa[]
+  id                                              BigInt        @id @default(autoincrement())
+  nome                                            String        @db.VarChar(50)
+  email                                           String?       @unique @db.VarChar(150)
+  ativo                                           Boolean       @default(true)
+  criado                                          DateTime      @default(now()) @db.Timestamp(6)
+  atualizado                                      DateTime?     @db.Timestamp(6)
+  pessoa_id                                       BigInt?
+  tipo_usuario                                    BigInt?
+  convite_convite_consumed_byTousuario            convite[]     @relation("convite_consumed_byTousuario")
+  convite_convite_created_byTousuario             convite[]     @relation("convite_created_byTousuario")
+  empresa                                         empresa[]
+  pessoa                                          pessoa?       @relation(fields: [pessoa_id], references: [id], onUpdate: NoAction, map: "fk_usuario_pessoa")
+  tipo_usuario_usuario_tipo_usuarioTotipo_usuario tipo_usuario? @relation("usuario_tipo_usuarioTotipo_usuario", fields: [tipo_usuario], references: [id], onUpdate: NoAction, map: "fk_usuario_tipo_usuario")
 
   @@schema("app")
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-model usuario_empresa {
-  id         BigInt   @id @default(autoincrement())
-  usuario_id BigInt
-  empresa_id BigInt
-  perfil     String
-  criado     DateTime @default(now()) @db.Timestamp(6)
-  empresa    empresa  @relation(fields: [empresa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  usuario    usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+model cidade {
+  id        Int    @id @default(autoincrement())
+  descricao String
+  uf        String @db.Char(2)
+  pais      String
 
-  @@unique([usuario_id, empresa_id])
-  @@unique([usuario_id, empresa_id], map: "ux_usuario_empresa")
   @@schema("app")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model fazenda {
-  id              BigInt            @id @default(autoincrement())
-  empresa_id      BigInt
-  nome            String
-  codigo          String?           @unique
-  criado          DateTime          @default(now()) @db.Timestamp(6)
-  empresa         empresa           @relation(fields: [empresa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  fazenda_usuario fazenda_usuario[]
-  convite         convite[]
+model endereco_empresa {
+  id        Int     @id @default(autoincrement())
+  logadouro String?
+  numero    Int?
+  bairro    String?
+  cidade    Int?
 
-  @@index([empresa_id], map: "idx_fazenda_empresa")
-  @@schema("agro")
+  @@schema("app")
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model fazenda_usuario {
-  id         BigInt   @id @default(autoincrement())
-  fazenda_id BigInt
-  usuario_id BigInt
-  perfil     String
-  criado     DateTime @default(now()) @db.Timestamp(6)
-  fazenda    fazenda  @relation(fields: [fazenda_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  usuario    usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+model tipo_usuario {
+  id                                         BigInt    @id @default(autoincrement())
+  tipo_usuario                               String?
+  usuario_usuario_tipo_usuarioTotipo_usuario usuario[] @relation("usuario_tipo_usuarioTotipo_usuario")
 
-  @@unique([fazenda_id, usuario_id])
-  @@index([fazenda_id], map: "idx_fazenda_usuario_fazenda")
-  @@index([usuario_id], map: "idx_fazenda_usuario_usuario")
-  @@schema("agro")
+  @@schema("app")
+}
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model clientes {
+// @@schema("agro")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model conciliacoes {
+// @@schema("agro")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model convites_fazenda {
+// @@schema("agro")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model eventos_nota_fiscal {
+// @@schema("agro")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// model fazenda {
+// @@schema("agro")
+// }
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// model fazenda_usuario {
+// @@schema("agro")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model fazendas {
+// @@schema("agro")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model gestoras {
+// @@schema("agro")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model itens_nota_fiscal {
+// @@schema("agro")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model itens_rurais {
+// @@schema("agro")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model lancamentos_financeiros {
+// @@schema("agro")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model notas_fiscais {
+// @@schema("agro")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+// model produtos {
+// @@schema("agro")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model transporte_nf {
+// @@schema("agro")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model usuarios_fazendas {
+// @@schema("agro")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model usuarios_gestora {
+// @@schema("agro")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// model audit_log_entries {
+// @@schema("auth")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// model flow_state {
+// @@schema("auth")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// model identities {
+// @@schema("auth")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// model instances {
+// @@schema("auth")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// model mfa_amr_claims {
+// @@schema("auth")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// model mfa_challenges {
+// @@schema("auth")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// model mfa_factors {
+// @@schema("auth")
+// }
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model oauth_authorizations {
+// @@schema("auth")
+// }
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model oauth_clients {
+// @@schema("auth")
+// }
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model oauth_consents {
+// @@schema("auth")
+// }
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// model one_time_tokens {
+// @@schema("auth")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// model refresh_tokens {
+// @@schema("auth")
+// }
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// model saml_providers {
+// @@schema("auth")
+// }
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// model saml_relay_states {
+// @@schema("auth")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// model schema_migrations {
+// @@schema("auth")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// model sessions {
+// @@schema("auth")
+// }
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+// model sso_domains {
+// @@schema("auth")
+// }
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+// model sso_providers {
+// @@schema("auth")
+// }
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+// model users {
+// @@schema("auth")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model cfop {
+// @@schema("catalogo")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model cst_csosn {
+// @@schema("catalogo")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model ibge_municipio {
+// @@schema("catalogo")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model ibge_uf {
+// @@schema("catalogo")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model ncm {
+// @@schema("catalogo")
+// }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model param_fiscais {
+// @@schema("catalogo")
+// }
+
+enum aal_level {
+  aal1
+  aal2
+  aal3
+
+  @@schema("auth")
+}
+
+enum code_challenge_method {
+  s256
+  plain
+
+  @@schema("auth")
+}
+
+enum factor_status {
+  unverified
+  verified
+
+  @@schema("auth")
+}
+
+enum factor_type {
+  totp
+  webauthn
+  phone
+
+  @@schema("auth")
+}
+
+enum oauth_authorization_status {
+  pending
+  approved
+  denied
+  expired
+
+  @@schema("auth")
+}
+
+enum oauth_client_type {
+  public
+  confidential
+
+  @@schema("auth")
+}
+
+enum oauth_registration_type {
+  dynamic
+  manual
+
+  @@schema("auth")
+}
+
+enum oauth_response_type {
+  code
+
+  @@schema("auth")
+}
+
+enum one_time_token_type {
+  confirmation_token
+  reauthentication_token
+  recovery_token
+  email_change_token_new
+  email_change_token_current
+  phone_change_token
+
+  @@schema("auth")
 }
