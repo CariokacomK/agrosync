@@ -1,21 +1,19 @@
 import usuarioRepository from "./usuario.repository";
-import { UsuarioDTO } from "./usuario.types";
+import { Usuario } from "./usuario.types";
 
 class UsuarioService {
-  async criarUsuario(data: UsuarioDTO) {
+  async criarUsuario(data: Usuario) {
     if(!await this.validarUsuario(data)) return usuarioRepository.create(data);
   }
 
-  private async validarUsuario(data: UsuarioDTO) {
-    const existeEmail = await usuarioRepository.findAll();
+  private async validarUsuario(data: Usuario) {
+    const existeEmail = await usuarioRepository.findByEmail(data.email ? data.email : "");
 
-    if (existeEmail.some(u => u.email === data.email)) {
+    if (existeEmail) {
       throw new Error("Já existe um usuário com este email");
     }
 
-    const existeDocumento = await usuarioRepository.findAll();
-
-    return (existeEmail || existeDocumento ? false : true);
+    return (existeEmail ? false : true);
   }
 
   async listarUsuarios() {
@@ -28,7 +26,7 @@ class UsuarioService {
     return usuario;
   }
 
-  async atualizarUsuario(id: number, data: UsuarioDTO) {
+  async atualizarUsuario(id: number, data: Usuario) {
     return usuarioRepository.update(id, data);
   }
 

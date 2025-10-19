@@ -1,20 +1,28 @@
 import prisma from "../../infra/database/client";
-import { UsuarioDTO } from "./usuario.types";
+import { Usuario } from "./usuario.types";
 
 class UsuarioRepository {
-  async create(data: UsuarioDTO) {
+  async create(data: Usuario) {
     return prisma.usuario.create({ data: data as any });
   }
 
   async findAll() {
-    return prisma.usuario.findMany();
+    return prisma.usuario.findMany({
+      include:{
+        pessoa: true
+      }
+    });
   }
 
   async findById(id: number) {
     return prisma.usuario.findUnique({ where: { id } });
   }
 
-  async update(id: number, data: UsuarioDTO) {
+  async findByEmail(email: string) {
+    return prisma.usuario.findUnique({ where: { email}})
+  }
+
+  async update(id: number, data: Usuario) {
     return prisma.usuario.update({ where: { id }, data: data as any });
   }
 

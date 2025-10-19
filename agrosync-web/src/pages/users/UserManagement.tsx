@@ -7,6 +7,7 @@ import { usePessoaService } from '../../services/pessoa.service';
 import { useUsuarioService } from '../../services/usuario.service';
 import AddUserModal from '../../components/users/AddUserModal';
 import EditUserModal from '../../components/users/EditUserModal';
+import type { IUsuarioDTO } from '../../models/usuario.model';
 
 const UserManagementPage: React.FC = () => {
   const pessoaService = usePessoaService();
@@ -19,25 +20,26 @@ const UserManagementPage: React.FC = () => {
 
   const loadUsers = React.useCallback(async () => {
     try {
-      const resp = await (usuarioService.findList?.(null));
-      const raw: any[] = (resp?.data as any)?.content ?? resp?.data ?? resp ?? [];
+      const resp = await (usuarioService.findList?.(null));      
+      const raw: IUsuarioDTO[] = (resp?.data as any)?.content ?? resp?.data ?? resp ?? [];
 
       const usuarios = raw.map((u: any) => ({
         ...u,
         id: u.id == null ? '' : String(u.id),
         pessoa_id: u.pessoa_id == null ? null : String(u.pessoa_id),
       }));
-
-      const hasPessoaNested = usuarios.length > 0 && usuarios[0]?.pessoa != null;
+      
+      const hasPessoaNested = usuarios.length > 0 && usuarios[0]?.pessoa_id != null;      
+      
       if (hasPessoaNested) {
-        const mapped = usuarios.map((u: any) => ({
+        const mapped = usuarios.map((u: IUsuarioDTO) => ({
           id: String(u.id),
-          nome: u.nome ?? u.pessoa?.nome ?? '—',
-          email: u.email ?? u.pessoa?.email ?? null,
-          tipo_pessoa: u.pessoa?.tipo_pessoa ?? u.pessoa?.tipoPessoa ?? null,
+          nome: u.nome ?? '—',
+          email: u.email ?? null,
+          tipo_pessoa: u.pessoa?.tipo_pessoa ?? null,
           ativo: u.ativo ?? true,
-          criado_em: u.criado ?? u.createdAt ?? null,
-          atualizado_em: u.atualizado ?? u.updatedAt ?? null,
+          criado_em: u.criado ?? null,
+          atualizado_em: u.atualizado ?? null,
           pessoa_id: u.pessoa_id,
         }));
         setUsers(mapped);
@@ -52,7 +54,7 @@ const UserManagementPage: React.FC = () => {
         listaP.forEach(p => pessoasMap.set(String(p.id), p));
       }
 
-      const mapped = usuarios.map((u: any) => {
+      const mapped = usuarios.map((u: IUsuarioDTO) => {
         const p = u.pessoa_id ? pessoasMap.get(String(u.pessoa_id)) : undefined;
         return {
           id: String(u.id),
@@ -60,8 +62,8 @@ const UserManagementPage: React.FC = () => {
           email: u.email ?? p?.email ?? null,
           tipo_pessoa: p?.tipo_pessoa ?? p?.tipoPessoa ?? null,
           ativo: u.ativo ?? true,
-          criado_em: u.criado ?? u.createdAt ?? null,
-          atualizado_em: u.atualizado ?? u.updatedAt ?? null,
+          criado_em: u.criado ?? null,
+          atualizado_em: u.atualizado ?? null,
           pessoa_id: u.pessoa_id,
         } as DisplayUser;
       });

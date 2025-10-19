@@ -1,4 +1,4 @@
-export interface PessoaDTO{
+export interface Pessoa{
     id?: bigint;
     nome: string | null;
     contato?: string | null;
