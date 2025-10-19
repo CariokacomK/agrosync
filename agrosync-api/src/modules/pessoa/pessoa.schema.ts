@@ -7,4 +7,4 @@ export const PessoaSchema = z.object({
     tipo_pessoa: z.string().optional(),
 })
 
-export type PessoaDTO = z.infer<typeof PessoaSchema>;
+export type Pessoa = z.infer<typeof PessoaSchema>;
